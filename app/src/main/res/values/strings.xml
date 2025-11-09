@@ -11,4 +11,5 @@
         <item>Shopping</item>
         <item>Other</item>
     </string-array>
+    <string name="default_web_client_id">493865798523-fbf6nagtn5duv7osbibl45lkb65tu1sf.apps.googleusercontent.com</string>
 </resources>

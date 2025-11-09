@@ -10,6 +10,12 @@ import android.widget.TextView;
 import android.app.AlertDialog;
 import androidx.room.Room;
 import java.util.ArrayList;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+
+
 
 public class MainActivity extends AppCompatActivity {
     ArrayList<Transaction> transactionList = new ArrayList<>();
@@ -22,6 +28,30 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        Button btnLogout = findViewById(R.id.btnLogout);
+//        btnLogout.setOnClickListener(v -> {
+//            FirebaseAuth.getInstance().signOut();
+//            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+//            finish();
+//        });
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        Button btnLogout = findViewById(R.id.btnLogout);
+        btnLogout.setOnClickListener(v -> {
+            // Sign out of Google AND Firebase!
+            mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                finish();
+            });
+        });
+
+
 
         tvIncome = findViewById(R.id.tvIncome);
         tvExpenses = findViewById(R.id.tvExpenses);
@@ -38,6 +68,13 @@ public class MainActivity extends AppCompatActivity {
         ListView listView = findViewById(R.id.listViewTransactions);
         adapter = new TransactionAdapter(this, transactionList);
         listView.setAdapter(adapter);
+
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
+            return;
+        }
+
 
         Button btnAdd = findViewById(R.id.btnAddTransaction);
         btnAdd.setOnClickListener(new View.OnClickListener() {
